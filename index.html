@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía Semanal de Alimentación</title>
+<style>
+  :root{
+    --bg:#1B211E;
+    --surface:#222A25;
+    --surface-2:#2A342E;
+    --border:#3A453D;
+    --text:#F2EDE1;
+    --text-muted:#A7B3A6;
+    --accent:#E3A857;
+    --accent-soft:#E3A85722;
+    --accent-2:#C4622D;
+    --good:#7FA37A;
+    --good-soft:#7FA37A1c;
+    --bad:#B2664F;
+    --bad-soft:#B2664F1c;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,'SF Pro Text',sans-serif;
+    font-size:15.5px;
+    line-height:1.55;
+  }
+  h1,h2,h3,h4{
+    font-family:Georgia,'Iowan Old Style','Times New Roman',serif;
+    font-weight:600;
+    letter-spacing:.2px;
+    margin:0 0 .4em 0;
+    color:var(--text);
+  }
+  .mono{font-family:ui-monospace,'SF Mono',Menlo,monospace;}
+  a{color:var(--accent);}
+
+  /* ---------- LAYOUT ---------- */
+  .app{display:grid; grid-template-columns:270px 1fr; min-height:100vh;}
+  .sidebar{
+    position:sticky; top:0; height:100vh; overflow-y:auto;
+    background:var(--surface);
+    border-right:1px solid var(--border);
+    padding:28px 18px 40px;
+  }
+  .brand{padding:0 6px 22px; border-bottom:1px solid var(--border); margin-bottom:18px;}
+  .brand .eyebrow{font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:11px; letter-spacing:2px; color:var(--accent); text-transform:uppercase;}
+  .brand h1{font-size:21px; margin-top:6px;}
+  .nav-group{margin-bottom:16px;}
+  .nav-group .label{
+    font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:10.5px; letter-spacing:1.6px;
+    color:var(--text-muted); text-transform:uppercase; padding:0 10px; margin-bottom:6px; display:block;
+  }
+  .nav-link{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 10px; border-radius:8px; color:var(--text-muted);
+    text-decoration:none; font-size:13.8px; cursor:pointer; transition:background .15s, color .15s;
+    border-left:2px solid transparent;
+  }
+  .nav-link:hover{background:var(--surface-2); color:var(--text);}
+  .nav-link.active{color:var(--accent); border-left:2px solid var(--accent); background:var(--accent-soft);}
+  .nav-link .dot{width:5px; height:5px; border-radius:50%; background:currentColor; opacity:.6; flex:none;}
+
+  main{padding:44px 52px 90px; max-width:980px;}
+  section{margin-bottom:64px; scroll-margin-top:26px;}
+  .kicker{font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:11.5px; letter-spacing:2px; color:var(--accent); text-transform:uppercase; margin-bottom:8px;}
+  section h2{font-size:28px; margin-bottom:6px;}
+  .section-sub{color:var(--text-muted); margin-bottom:26px; max-width:640px;}
+
+  /* ---------- CARDS / TABLES ---------- */
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:22px 24px;}
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  @media(max-width:720px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+
+  table{width:100%; border-collapse:collapse; font-size:14.5px;}
+  th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:top;}
+  th{font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); font-weight:500;}
+  tr:last-child td{border-bottom:none;}
+  .time-cell{font-family:ui-monospace,'SF Mono',Menlo,monospace; color:var(--accent); white-space:nowrap; font-size:13.5px;}
+
+  .option-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:18px 20px; margin-bottom:14px;
+  }
+  .option-card h4{font-size:15.5px; margin-bottom:10px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .option-num{
+    font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:11px; background:var(--surface-2);
+    color:var(--accent); border-radius:5px; padding:2px 7px;
+  }
+  .option-card ul{margin:0; padding-left:18px; color:var(--text-muted);}
+  .option-card ul li{margin-bottom:3px;}
+  .option-card .prep{margin-top:10px; padding-top:10px; border-top:1px dashed var(--border);}
+  .option-card .prep ol{margin:6px 0 0; padding-left:18px; color:var(--text-muted);}
+  .option-card .swap{margin-top:10px; font-size:13.5px; color:var(--text-muted);}
+  .option-card .swap b{color:var(--text);}
+
+  .badge{
+    font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:10.5px; letter-spacing:.5px;
+    border-radius:20px; padding:2px 9px; display:inline-flex; align-items:center; gap:5px;
+  }
+  .badge.embutido{background:var(--bad-soft); color:var(--bad);}
+  .badge.base{background:var(--accent-soft); color:var(--accent);}
+
+  .note{
+    border-left:3px solid var(--accent); background:var(--surface-2);
+    padding:12px 16px; border-radius:0 10px 10px 0; font-size:14px; color:var(--text-muted); margin:14px 0;
+  }
+  .note b{color:var(--text);}
+  .note.warn{border-left-color:var(--bad);}
+  .note.good{border-left-color:var(--good);}
+
+  /* measurement legend (signature element) */
+  .measure-legend{display:flex; flex-wrap:wrap; gap:14px; margin:18px 0 4px;}
+  .measure{
+    display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:10px 14px; flex:1 1 210px;
+  }
+  .measure svg{flex:none; color:var(--accent);}
+  .measure .m-title{font-size:13.5px; font-weight:600;}
+  .measure .m-sub{font-size:12.5px; color:var(--text-muted);}
+
+  /* day tabs */
+  .day-tabs{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px;}
+  .day-tab{
+    font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:12.5px; letter-spacing:.5px;
+    padding:9px 16px; border-radius:9px; border:1px solid var(--border); background:var(--surface);
+    color:var(--text-muted); cursor:pointer; transition:.15s;
+  }
+  .day-tab:hover{color:var(--text); border-color:var(--accent);}
+  .day-tab.active{background:var(--accent); color:#20180B; border-color:var(--accent); font-weight:600;}
+  .day-tab .tag{display:block; font-size:9.5px; opacity:.75; margin-top:2px;}
+  .day-panel{display:none;}
+  .day-panel.active{display:block;}
+  .day-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; flex-wrap:wrap; gap:8px;}
+  .day-head h3{font-size:20px; margin:0;}
+  .day-flags{display:flex; gap:8px;}
+  .flag{font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:10.5px; padding:3px 9px; border-radius:20px;}
+  .flag.train{background:var(--good-soft); color:var(--good);}
+  .flag.rest{background:var(--surface-2); color:var(--text-muted);}
+
+  .meal-row{display:grid; grid-template-columns:120px 1fr 1fr; gap:14px; padding:14px 0; border-bottom:1px solid var(--border);}
+  .meal-row:last-child{border-bottom:none;}
+  .meal-row .m-time{font-family:ui-monospace,'SF Mono',Menlo,monospace; color:var(--accent); font-size:13px;}
+  .meal-row .m-label{font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); font-family:ui-monospace,'SF Mono',Menlo,monospace; margin-top:3px;}
+  .meal-row .m-main b{display:block; margin-bottom:5px; font-size:14.5px;}
+  .meal-row .m-main ul{margin:0; padding-left:16px; color:var(--text-muted); font-size:13.6px;}
+  .meal-row .m-alt{font-size:13px; color:var(--text-muted);}
+  .meal-row .m-alt b{color:var(--text); font-weight:500;}
+  @media(max-width:760px){.meal-row{grid-template-columns:1fr;}}
+
+  ul.plain{padding-left:18px; color:var(--text-muted);}
+  ul.plain li{margin-bottom:5px;}
+
+  .two-col-lists{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
+  @media(max-width:720px){.two-col-lists{grid-template-columns:1fr;}}
+  .list-title{font-size:13px; text-transform:uppercase; letter-spacing:1px; font-family:ui-monospace,'SF Mono',Menlo,monospace; margin-bottom:10px;}
+  .list-title.good{color:var(--good);}
+  .list-title.bad{color:var(--bad);}
+
+  .case-card{border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:12px; background:var(--surface);}
+  .case-card .case-tag{font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:11px; color:var(--accent); letter-spacing:1px;}
+  .case-card h4{font-size:15px; margin:4px 0 8px;}
+
+  .checklist-row{display:flex; align-items:center; gap:8px; padding:5px 0; color:var(--text-muted); font-size:13.8px;}
+  .checklist-row svg{flex:none; color:var(--good);}
+
+  footer{padding:40px 52px 60px; color:var(--text-muted); font-size:13px; border-top:1px solid var(--border); max-width:980px;}
+
+  ::-webkit-scrollbar{width:9px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--surface-2); border-radius:8px;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="brand">
+      <span class="eyebrow">Plan semi-déficit</span>
+      <h1>Guía de<br>Alimentación</h1>
+    </div>
+
+    <div class="nav-group">
+      <span class="label">Empezar</span>
+      <a class="nav-link" data-target="inicio"><span class="dot"></span>Cómo usar esta guía</a>
+      <a class="nav-link" data-target="horarios"><span class="dot"></span>Horarios del día</a>
+      <a class="nav-link" data-target="medidas"><span class="dot"></span>Porciones sin balanza</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="label">Lo que como</span>
+      <a class="nav-link" data-target="calendario"><span class="dot"></span>Calendario semanal</a>
+      <a class="nav-link" data-target="biblioteca"><span class="dot"></span>Biblioteca de comidas</a>
+      <a class="nav-link" data-target="frutas"><span class="dot"></span>Frutas</a>
+      <a class="nav-link" data-target="sustituciones"><span class="dot"></span>Sustituciones</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="label">Referencia</span>
+      <a class="nav-link" data-target="macros"><span class="dot"></span>Calorías y macros</a>
+      <a class="nav-link" data-target="hidratacion"><span class="dot"></span>Hidratación</a>
+      <a class="nav-link" data-target="entrenamiento"><span class="dot"></span>Entrenamiento y cardio</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="label">Flexibilidad</span>
+      <a class="nav-link" data-target="fuera"><span class="dot"></span>Comer fuera</a>
+      <a class="nav-link" data-target="gusto"><span class="dot"></span>Comidas de gusto</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="label">Progreso</span>
+      <a class="nav-link" data-target="seguimiento"><span class="dot"></span>Seguimiento</a>
+      <a class="nav-link" data-target="ajustes"><span class="dot"></span>Sistema de ajustes</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="label">Reglas</span>
+      <a class="nav-link" data-target="preferencias"><span class="dot"></span>Preferencias y embutidos</a>
+      <a class="nav-link" data-target="reglas"><span class="dot"></span>Reglas del sistema</a>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- 1. INICIO -->
+    <section id="inicio">
+      <div class="kicker">Portada</div>
+      <h2>Tu guía de alimentación, sin báscula</h2>
+      <p class="section-sub">Una forma práctica de comer para perder grasa poco a poco mientras conservas músculo y rendimiento — pensada para sostenerse durante meses, no solo una semana perfecta.</p>
+
+      <div class="card">
+        <h4 style="font-family:Georgia,'Iowan Old Style',serif; font-size:16px; margin-bottom:10px;">Cómo usar este plan</h4>
+        <ul class="plain">
+          <li>Ve a <b>Calendario semanal</b> para ver exactamente qué comer hoy y a qué hora.</li>
+          <li>Si falta un ingrediente o quieres variar, revisa <b>Biblioteca de comidas</b> o <b>Sustituciones</b> — no es necesario repetir siempre lo mismo.</li>
+          <li>No es necesario pesar nada. Todas las cantidades están en medidas prácticas: tazas, cucharadas, palmas, tortillas, paquetes.</li>
+          <li>1–2 comidas de gusto por semana están permitidas y contempladas — no rompen el plan.</li>
+          <li>Este documento no cambia por un mal día o una fluctuación de peso. Los ajustes se hacen mirando tendencias de varias semanas, revisa <b>Sistema de ajustes</b>.</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <b>Filosofía del plan:</b> suficientemente estructurado para dar resultados, suficientemente flexible para no sentirse una cárcel alimentaria. Comer con la familia, en la escuela, salir a comer, tener una pizza ocasional — todo cabe aquí.
+      </div>
+    </section>
+
+    <!-- 2. HORARIOS -->
+    <section id="horarios">
+      <div class="kicker">Ritmo diario</div>
+      <h2>Horarios del día</h2>
+      <p class="section-sub">Cinco comidas, ajustadas al horario escolar entre semana y con más margen el fin de semana.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4 style="font-size:15px;">Lunes a viernes — escuela</h4>
+          <p style="color:var(--text-muted); font-size:13.5px; margin-top:-6px;">Despertar aprox. 5:50 AM</p>
+          <table>
+            <tr><td class="time-cell">6:00 – 6:20 AM</td><td>Desayuno</td></tr>
+            <tr><td class="time-cell">9:45 – 10:05 AM</td><td>Merienda 1</td></tr>
+            <tr><td class="time-cell">11:45 AM – 12:20 PM</td><td>Almuerzo</td></tr>
+            <tr><td class="time-cell">3:50 – 4:00 PM</td><td>Merienda 2</td></tr>
+            <tr><td class="time-cell">6:45 – 7:05 PM</td><td>Cena</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h4 style="font-size:15px;">Fin de semana</h4>
+          <p style="color:var(--text-muted); font-size:13.5px; margin-top:-6px;">Despertar aprox. 9:00–10:00 AM</p>
+          <table>
+            <tr><td class="time-cell">~10:00 AM</td><td>Desayuno</td></tr>
+            <tr><td class="time-cell">+3 h aprox.</td><td>Merienda</td></tr>
+            <tr><td class="time-cell">+2–3 h aprox.</td><td>Almuerzo</td></tr>
+            <tr><td class="time-cell">+3–4 h aprox.</td><td>Merienda</td></tr>
+            <tr><td class="time-cell">+3 h aprox.</td><td>Cena</td></tr>
+          </table>
+          <p style="font-size:12.5px; color:var(--text-muted); margin-top:10px;">Referencia aproximada, no un horario rígido — se ajusta con naturalidad según el día.</p>
+        </div>
+      </div>
+
+      <div class="note">
+        Días de entrenamiento habituales: <b>lunes, martes, jueves y viernes</b>, generalmente alrededor de las <b>3:30 PM</b> o las <b>7:30 PM</b>. Los viernes hay clase de educación física. La comida antes o después del entrenamiento se explica en <a href="#entrenamiento">Entrenamiento y cardio</a>.
+      </div>
+    </section>
+
+    <!-- 3. MEDIDAS -->
+    <section id="medidas">
+      <div class="kicker">Sin báscula</div>
+      <h2>Porciones sin balanza</h2>
+      <p class="section-sub">Referencias visuales, no equivalencias exactas de laboratorio. Suficientes para ser consistente sin pesar cada comida.</p>
+
+      <div class="measure-legend">
+        <div class="measure">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 13c0-3 2-6 4-7 1-.5 2 0 2 1 0-1 1-1.5 2-1 2 1 4 4 4 7 0 3-2 6-6 6s-6-3-6-6Z"/><path d="M8 13v3M12 13v4M16 13v3"/></svg>
+          <div><div class="m-title">Proteína</div><div class="m-sub">~3–4 oz cocidas ≈ una palma de la mano</div></div>
+        </div>
+        <div class="measure">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 9h12l-1.2 9a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 9Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+          <div><div class="m-title">Carbohidrato</div><div class="m-sub">1/2–1 taza cocida, 2 tortillas o 2 rebanadas de pan</div></div>
+        </div>
+        <div class="measure">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16" stroke-dasharray="2 3"/></svg>
+          <div><div class="m-title">Vegetales</div><div class="m-sub">~1 taza o más, cuando se toleren bien</div></div>
+        </div>
+      </div>
+
+      <div class="two-col-lists" style="margin-top:22px;">
+        <div>
+          <div class="list-title good">Proteína ≈ una palma</div>
+          <ul class="plain">
+            <li>Pollo o carne del tamaño de la palma de la mano</li>
+            <li>Un filete pequeño</li>
+            <li>Pollo mechado, porción equivalente a una palma</li>
+          </ul>
+        </div>
+        <div>
+          <div class="list-title good">Carbohidrato práctico</div>
+          <ul class="plain">
+            <li>1/2–1 taza de arroz cocido</li>
+            <li>2 tortillas · 2 rebanadas de pan</li>
+            <li>2/3–1 taza de pasta cocida</li>
+            <li>1 papa mediana · 3/4–1 taza de yuca</li>
+            <li>1/2–1 plátano, según preparación</li>
+          </ul>
+        </div>
+      </div>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:16px;">Cuando una comida trae una cantidad específica de la guía original, esa cantidad se mantiene — la medida visual es solo una ayuda adicional, no la reemplaza.</p>
+    </section>
+
+    <!-- 4. CALENDARIO -->
+    <section id="calendario">
+      <div class="kicker">Qué como hoy</div>
+      <h2>Calendario semanal</h2>
+      <p class="section-sub">Una semana completa de ejemplo, rotando las opciones para evitar monotonía. Los embutidos aparecen máximo 2 veces en toda la semana.</p>
+
+      <div class="day-tabs" id="dayTabs"></div>
+      <div id="dayPanels"></div>
+    </section>
+
+    <!-- 5. BIBLIOTECA -->
+    <section id="biblioteca">
+      <div class="kicker">Biblioteca completa</div>
+      <h2>Opciones detalladas por comida</h2>
+      <p class="section-sub">Todas las opciones disponibles para cada horario — úsalas para variar o para reemplazar cualquier día del calendario.</p>
+
+      <h3 style="margin-top:6px;">Desayuno · 6:00–6:20 AM</h3>
+      <div class="option-card">
+        <h4><span class="option-num">Opción 1</span> Pan + huevo + queso</h4>
+        <ul><li>2 rebanadas de pan blanco</li><li>1 huevo revuelto</li><li>2 oz de queso blanco prensado</li><li>3/4 taza de piña</li></ul>
+        <div class="swap"><b>Nota:</b> la fruta puede cambiarse por otra porción equivalente de la lista de frutas.</div>
+      </div>
+      <div class="option-card">
+        <h4><span class="option-num">Opción 2</span> Wrap <span class="badge embutido">contiene embutido</span></h4>
+        <ul><li>2 tortillas Bimbo Rapiditas integral (o 2 tortillas mexicanas tipo fajita)</li><li>2 rebanadas de queso Munster o mozzarella bajo en grasa</li><li>1 rebanada de jamón de pavo</li><li>17 uvas pequeñas sin semillas</li></ul>
+        <div class="swap"><b>Regla de embutidos:</b> no consumir más de ~2 veces por semana. En otros días, el jamón puede sustituirse por una proteína fresca — no es una equivalencia matemática exacta.</div>
+      </div>
+      <div class="option-card">
+        <h4><span class="option-num">Opción 3</span> Crepes de avena</h4>
+        <ul><li>6 cucharadas de harina de avena</li><li>1 huevo</li><li>1 chorrito de leche</li><li>vainilla y canela al gusto</li></ul>
+        <div class="prep"><b>Preparación</b>
+          <ol><li>Mezclar todo hasta una mezcla ligera, no espesa.</li><li>Calentar el sartén.</li><li>Verter poca cantidad para formar crepes.</li><li>Dorar por ambos lados.</li></ol>
+        </div>
+        <div class="swap">Acompañar con 1 manzana pequeña picada (o 3/4 taza de piña salteada con canela) + 1 yogurt griego Oikos Triple Zero.</div>
+      </div>
+      <div class="option-card">
+        <h4><span class="option-num">Opción 4</span> Pancakes</h4>
+        <ul><li>5 cucharadas de harina de trigo</li><li>1 huevo</li><li>1 cdita chispas de chocolate sugar free (opcional)</li><li>canela al gusto</li><li>1/2 cdita polvo de hornear (opcional)</li><li>1 cdita o 1 sobre de Stevia/Monkfruit</li></ul>
+        <div class="prep"><b>Preparación</b>
+          <ol><li>Licuar todos los ingredientes.</li><li>Verter en el sartén.</li><li>Voltear cuando aparezcan burbujas.</li></ol>
+        </div>
+        <div class="swap">Se pueden preparar la noche anterior. Con 3–4 cda sirope sugar free (Log Cabin/Savoré) o 1 cda de mermelada sugar free. Acompañar con 1 huevo en omelette + 1 oz queso blanco prensado + 1 guineo pequeño.</div>
+      </div>
+      <div class="option-card">
+        <h4><span class="option-num">Opción 5</span> Tortillas de maíz</h4>
+        <ul><li>2 tortillas de maíz medianas asadas (o 1 bollo de maíz asado)</li><li>1 huevo revuelto</li><li>2 oz de queso blanco prensado</li><li>1 manzana pequeña</li></ul>
+      </div>
+      <div class="option-card">
+        <h4><span class="option-num">Opción 6</span> Arepa de maíz</h4>
+        <ul><li>1 arepa de maíz grande (La Real, El Antojo o Panameñita), o 2 arepas Extra Delgadas</li><li>2 huevos revueltos</li><li>1 rebanada de queso Munster</li><li>1 mandarina grande</li></ul>
+      </div>
+
+      <h3>Merienda 1 · 9:45–10:05 AM</h3>
+      <div class="option-card"><h4><span class="option-num">Opción 1</span></h4><ul><li>1 rebanada de pan blanco + tomate + 2 cda de queso parmesano (o 1 oz de queso molido)</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 2</span></h4><ul><li>1 barrita de granola Tosh + 1/4 taza de maní</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 3</span></h4><ul><li>1 paquete de SkinnyPop + 16 pistachos</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 4</span></h4><ul><li>1 paquete de galletas Salmas + 16 pistachos</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 5</span></h4><ul><li>1 rebanada de pan blanco + 1 cucharada de mantequilla de maní</li></ul></div>
+
+      <h3>Almuerzo · 11:45 AM–12:20 PM</h3>
+      <p style="color:var(--text-muted); font-size:13.5px; margin-top:-10px;">Estructura general: proteína + carbohidrato + vegetales + grasa moderada.</p>
+      <div class="option-card"><h4><span class="option-num">Opción 1</span> Arroz + lentejas</h4><ul><li>1/3 taza de arroz blanco</li><li>1/2 taza de lentejas</li><li>3 oz de pollo o carne a la plancha o guisados</li><li>1 taza de ensalada mixta (tomate, lechuga, cebolla salteada, zanahoria, etc.)</li><li>2 cucharaditas de aceite de oliva</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 2</span> Yuca + pollo/salmón</h4><ul><li>1 taza de yuca en Air Fryer</li><li>3 oz de pollo o salmón a la plancha</li><li>1 taza de vegetales en Air Fryer (ej. brócoli)</li><li>1 cucharadita de aceite de oliva</li><li>2 cucharadas de queso parmesano (puede ir sobre el brócoli antes de la Air Fryer)</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 3</span> Plátano + pollo</h4><ul><li>1/2 plátano maduro asado o al horno</li><li>1 oz de queso blanco prensado</li><li>2 oz de pollo a la plancha</li><li>1 taza de vegetales (lechuga, zanahoria, pimentones, etc.)</li><li>2 cucharaditas de aceite de oliva</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 4</span> Papas + carne/pollo</h4><ul><li>1 taza de papas (hervidas, al horno, en puré o salteadas)</li><li>3 oz de carne guisada o pollo a la plancha</li><li>1 taza de vegetales salteados (pimentón, zanahoria)</li><li>1 cucharadita de aceite de oliva</li><li>1 oz de aguacate en guacamole</li></ul>
+        <div class="swap">La papa no tiene que comerse sola: puede ir en puré, al horno, en Air Fryer, salteada, con especias, junto al pollo/carne.</div>
+      </div>
+      <div class="option-card"><h4><span class="option-num">Opción 5</span> Wrap <span class="badge base">sin embutido si usas pollo</span></h4><ul><li>2 tortillas Bimbo Rapiditas integral (o 2 tortillas mexicanas tipo fajita)</li><li>2 rebanadas de mozzarella bajo en grasa</li><li>1 rebanada de jamón de pavo, o 3 oz de pollo mechado</li><li>1/2 taza de vegetales (lechuga, tomate)</li><li>32 pistachos, o 16 pistachos + 1 cdita de aceite de oliva</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 6</span> Ensalada de pasta</h4><ul><li>2/3 taza de pasta</li><li>3 oz de atún en agua</li><li>1 taza de vegetales de preferencia</li><li>2 cucharadas de mayonesa light</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 7</span> Emparedado de pollo</h4><ul><li>2 rebanadas de pan blanco</li><li>3 oz de pollo mechado ya cocinado</li><li>lechuga, tomate, pepino</li><li>2 cucharadas de mayonesa light</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 8</span> Brochetas de queso con tomate</h4><ul><li>10 tortillas de maíz Flaca Panameña (o 2 paquetes de galletas Salmas)</li><li>3 oz de queso blanco</li><li>tomate al gusto</li><li>2 oz de aguacate en forma de guacamole</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 9</span> Sopa de carne</h4><ul><li>1/2 taza de verdura (papa, yuca, ñame, otoe, etc.) o 1 mazorca pequeña</li><li>1/3 taza de arroz</li><li>3 oz de carne de res</li><li>1 taza de vegetales</li><li>2 cucharaditas de aceite de oliva</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 10</span> Sopa de lentejas</h4><ul><li>1 taza de lentejas</li><li>3 oz de carne picada</li><li>2 tazas de vegetales</li><li>1 cucharadita de aceite de oliva</li><li>16 pistachos</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 11</span> Crema de zapallo o brócoli</h4><ul><li>zapallo o brócoli cocido</li><li>cebolla</li><li>caldo de pollo natural</li></ul>
+        <div class="prep"><b>Preparación</b><ol><li>Licuar los ingredientes.</li><li>Verter en una olla.</li><li>Hervir unos minutos.</li></ol></div>
+        <div class="swap">Acompañar con 2/3 taza de arroz + 3 oz de pollo mechado (agregado a la crema) o pollo al horno + 2 cda de queso parmesano + 1 cdita de aceite de oliva.</div>
+      </div>
+
+      <h3>Merienda 2 · 3:50–4:00 PM</h3>
+      <p style="color:var(--text-muted); font-size:13.5px; margin-top:-10px;">Base fija: 1 yogurt Bonlac Non Fat (bebible o no). Elegir una opción adicional:</p>
+      <div class="option-card"><h4><span class="option-num">Opción 1</span></h4><ul><li>1 guineo pequeño + 1 cucharada de mantequilla de maní</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 2</span></h4><ul><li>1 paquete de Salmas o Noel integral + 2 cucharadas de queso crema bajo en grasa</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 3</span></h4><ul><li>1 manzana pequeña + 16 pistachos</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 4</span></h4><ul><li>17 uvas pequeñas sin semillas + 16 pistachos</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 5</span></h4><ul><li>3/4 taza de piña + 1/4 taza de maní</li></ul>
+        <div class="swap">La grasa puede variar entre maní, almendras, pistachos, nueces mixtas, pepitas de marañón, etc.</div>
+      </div>
+
+      <h3>Cena · 6:45–7:05 PM</h3>
+      <div class="option-card"><h4><span class="option-num">Opción 1</span> Salmas + pollo/atún</h4><ul><li>2 paquetes de galletas Salmas</li><li>3 oz de pollo mechado o 3 oz de atún en agua</li><li>1 taza de vegetales (pepino, pimentón, tomate, etc.)</li><li>1 cucharadita de aceite de oliva (o 1 cda de mayonesa light)</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 2</span> Wrap o tacos</h4><ul><li>2 tortillas integrales Bimbo Rapiditas (o 2 tortillas mexicanas tipo fajita)</li><li>3 oz de pollo mechado o a la plancha</li><li>1 taza de vegetales (lechuga, tomate, pepino)</li><li>1 cucharadita de aceite de oliva</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 3</span> Tortillas + huevo + queso</h4><ul><li>2 tortillas de maíz medianas asadas (o 1 bollo de maíz asado)</li><li>1 huevo revuelto</li><li>2 oz de queso blanco prensado</li><li>1/2 taza de vegetales (espinaca, hongos, tomate, cebolla)</li><li>1 cucharadita de aceite de oliva</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 4</span> Omelette</h4><ul><li>2 rebanadas de pan blanco tostado</li><li>omelette de 2 huevos</li><li>1 rebanada de queso Munster</li><li>1/2 taza de pimentón, cebolla, hongos, tomate</li><li>1 cucharadita de aceite de oliva</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 5</span> Quesadilla</h4><ul><li>2 tortillas integrales Bimbo Rapiditas (o 2 tortillas mexicanas)</li><li>3 rebanadas de queso Munster o mozzarella bajo en grasa</li><li>1/2 taza de pimentón, tomate y cebolla</li><li>1 cucharadita de aceite de oliva</li></ul></div>
+      <div class="option-card"><h4><span class="option-num">Opción 6</span> Lasaña</h4><ul><li>42 g de pasta precocida para lasaña (peso en crudo, referencia original)</li><li>2 oz de carne, pollo o combinación</li><li>1 rebanada de queso mozzarella</li><li>1 taza de vegetales</li><li>1 cucharadita de aceite de oliva para guisar la carne/pollo</li></ul>
+        <div class="swap">Si se agrega alguna salsa a base de mantequilla, no añadir grasa adicional. Si la porción sale muy pequeña, se recomienda comerla como algo libre para disfrutarla.</div>
+      </div>
+      <div class="option-card"><h4><span class="option-num">Opción 7</span> Pizza casera <span class="badge embutido">contiene embutido</span></h4><ul><li>2 panes pita mini integrales</li><li>2 rebanadas de queso Munster o mozzarella bajo en grasa</li><li>1 rebanada de jamón de pavo</li><li>1/2 taza de pimentón, tomate y cebolla</li><li>1 cucharadita de aceite de oliva</li><li>1 cucharada de salsa de tomate sugar free</li></ul>
+        <div class="swap">Contiene embutido — se cuenta dentro del límite práctico semanal de ~2 veces.</div>
+      </div>
+    </section>
+
+    <!-- 6. FRUTAS -->
+    <section id="frutas">
+      <div class="kicker">Referencia rápida</div>
+      <h2>Frutas · una porción</h2>
+      <p class="section-sub">La fruta no se elimina solo por contener azúcar. Sus favoritas — banana, piña, uvas — tienen prioridad, pero toda la lista es válida.</p>
+      <div class="card">
+        <table>
+          <tr><th>Fruta</th><th>Porción práctica</th></tr>
+          <tr><td>Manzana</td><td>1 pequeña</td></tr>
+          <tr><td>Pera</td><td>1 chica</td></tr>
+          <tr><td>Piña</td><td>3/4 taza</td></tr>
+          <tr><td>Banana</td><td>1/2 banana (referencia original) o 1 pequeña, según la opción</td></tr>
+          <tr><td>Uvas</td><td>15–17</td></tr>
+          <tr><td>Pasitas</td><td>2 cucharadas</td></tr>
+          <tr><td>Papaya</td><td>1 taza</td></tr>
+          <tr><td>Naranja</td><td>1</td></tr>
+          <tr><td>Agua de pipa</td><td>4 oz</td></tr>
+          <tr><td>Sandía</td><td>1 1/4 taza</td></tr>
+          <tr><td>Blueberries</td><td>3/4 taza</td></tr>
+          <tr><td>Ciruelas</td><td>2 pequeñas</td></tr>
+          <tr><td>Fresas</td><td>1 1/4 taza</td></tr>
+          <tr><td>Mango</td><td>1/2 taza</td></tr>
+          <tr><td>Melón</td><td>1 taza</td></tr>
+          <tr><td>Kiwi</td><td>1/2 taza</td></tr>
+          <tr><td>Cerezas</td><td>12</td></tr>
+          <tr><td>Mandarina</td><td>1 grande o 2 pequeñas</td></tr>
+          <tr><td>Durazno</td><td>1</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- 7. SUSTITUCIONES -->
+    <section id="sustituciones">
+      <div class="kicker">Manual de reemplazos</div>
+      <h2>Sustituciones y equivalencias</h2>
+      <p class="section-sub">Buscan conservar la función del alimento en la comida — no son equivalencias calóricas exactas. Cuando hay una diferencia relevante de proteína, grasa o carbohidrato, se señala.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4 style="font-size:15px;">Proteínas</h4>
+          <p style="font-size:13.5px; color:var(--text-muted);">Una porción principal (~3 oz en las opciones originales) puede rotar entre:</p>
+          <ul class="plain"><li>Pollo</li><li>Carne</li><li>Camarones</li><li>Salmón</li><li>Atún en agua</li><li>Pollo mechado</li></ul>
+          <div class="note warn" style="margin-top:12px;">2 huevos ≠ 3 oz de pollo en proteína exacta. Si sustituyes por huevo o queso, complementa con otra fuente si quieres igualar mejor la proteína.</div>
+        </div>
+        <div class="card">
+          <h4 style="font-size:15px;">Grasas</h4>
+          <p style="font-size:13.5px; color:var(--text-muted);">Una pequeña fuente de grasa puede variar entre:</p>
+          <ul class="plain"><li>Aceite de oliva</li><li>Mantequilla de maní</li><li>Pistachos, maní, almendras, nueces</li><li>Aguacate</li></ul>
+          <div class="note" style="margin-top:12px;">Si una comida ya trae queso + aguacate + frutos secos, no se añade además una gran cantidad de aceite.</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <h4 style="font-size:15px;">Carbohidratos — reemplazos prácticos</h4>
+        <table>
+          <tr><th>Si falta</th><th>Cantidad práctica de reemplazo</th></tr>
+          <tr><td>Arroz</td><td>1/3–1/2 taza, o la cantidad indicada por la comida</td></tr>
+          <tr><td>Pasta</td><td>~2/3 taza, según la estructura del almuerzo</td></tr>
+          <tr><td>Pan</td><td>2 rebanadas</td></tr>
+          <tr><td>Tortillas</td><td>2 integrales tipo Rapiditas, 2 mexicanas, o 2 de maíz medianas</td></tr>
+          <tr><td>Papa</td><td>~1 taza</td></tr>
+          <tr><td>Yuca</td><td>~1 taza</td></tr>
+          <tr><td>Plátano</td><td>~1/2 plátano</td></tr>
+        </table>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-top:10px;">Se respeta el tamaño y tipo de comida — no todas tienen calorías idénticas, aunque cumplan la misma función.</p>
+      </div>
+    </section>
+
+    <!-- 8. MACROS -->
+    <section id="macros">
+      <div class="kicker">Referencia, no obligación</div>
+      <h2>Calorías y macros</h2>
+      <p class="section-sub">Sirven para familiarizarte con las cifras, no para perseguirlas de forma obsesiva.</p>
+
+      <div class="grid-3">
+        <div class="card"><h4 style="font-size:14px; color:var(--text-muted);">CALORÍAS</h4><div style="font-family:Georgia,'Iowan Old Style',serif; font-size:30px; color:var(--accent);">~2,400 kcal</div><p style="font-size:13px; color:var(--text-muted);">Referencia inicial aproximada — no una cifra matemática obligatoria cada día.</p></div>
+        <div class="card"><h4 style="font-size:14px; color:var(--text-muted);">PROTEÍNA</h4><div style="font-family:Georgia,'Iowan Old Style',serif; font-size:30px; color:var(--accent);">125–150 g</div><p style="font-size:13px; color:var(--text-muted);">Preferible mantenerse hacia la parte alta cuando sea práctico.</p></div>
+        <div class="card"><h4 style="font-size:14px; color:var(--text-muted);">GRASAS</h4><div style="font-family:Georgia,'Iowan Old Style',serif; font-size:30px; color:var(--accent);">65–80 g</div><p style="font-size:13px; color:var(--text-muted);">Aguacate, pistachos, maní, almendras, nueces, aceite de oliva, semillas.</p></div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <h4 style="font-size:15px;">Distribución de proteína por comida (referencia)</h4>
+        <table>
+          <tr><th>Comida</th><th>Proteína aprox.</th></tr>
+          <tr><td>Desayuno</td><td>20–30 g</td></tr>
+          <tr><td>Merienda 1</td><td>10–20 g</td></tr>
+          <tr><td>Almuerzo</td><td>30–40 g</td></tr>
+          <tr><td>Merienda 2</td><td>10–20 g</td></tr>
+          <tr><td>Cena</td><td>25–35 g</td></tr>
+        </table>
+      </div>
+
+      <div class="note" style="margin-top:16px;">Los carbohidratos cubren el resto de las calorías: arroz, pasta, pan, tortillas, avena, papa, yuca, plátano, frutas. No se eliminan por buscar perder grasa.</div>
+    </section>
+
+    <!-- 9. HIDRATACION -->
+    <section id="hidratacion">
+      <div class="kicker">Líquidos</div>
+      <h2>Hidratación</h2>
+      <p class="section-sub">Referencia práctica, no una obligación exacta — se ajusta según calor, sudoración, entrenamiento y actividad.</p>
+      <div class="card">
+        <div style="font-family:Georgia,'Iowan Old Style',serif; font-size:26px; color:var(--accent); margin-bottom:14px;">2.3 – 3.0 litros / día</div>
+        <table>
+          <tr><td class="time-cell">Mañana</td><td>500–750 ml</td></tr>
+          <tr><td class="time-cell">Escuela</td><td>500–750 ml</td></tr>
+          <tr><td class="time-cell">Alrededor del entrenamiento</td><td>500–750 ml</td></tr>
+          <tr><td class="time-cell">Tarde / noche</td><td>Completar el resto según sed y actividad</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- 10. ENTRENAMIENTO -->
+    <section id="entrenamiento">
+      <div class="kicker">Actividad</div>
+      <h2>Entrenamiento, pasos y cardio</h2>
+      <p class="section-sub">La prioridad durante la pérdida de grasa es mantener rendimiento y masa muscular — no es necesario buscar un gran aumento muscular.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4 style="font-size:15px;">Si entrenas ~3:30 PM</h4>
+          <p style="font-size:13.5px; color:var(--text-muted);">La merienda de 3:50–4:00 PM funciona como comida post-entreno. Prioriza <b style="color:var(--text);">proteína + carbohidrato</b>:</p>
+          <ul class="plain"><li>Yogurt + banana + mantequilla de maní</li><li>Yogurt + fruta + pistachos</li><li>Yogurt + Salmas</li><li>Yogurt + fruta</li></ul>
+          <p style="font-size:12.5px; color:var(--text-muted);">No es obligatorio usar suplementos.</p>
+        </div>
+        <div class="card">
+          <h4 style="font-size:15px;">Si entrenas ~7:30 PM</h4>
+          <p style="font-size:13.5px; color:var(--text-muted);">La cena de 6:45–7:05 PM funciona como comida pre-entreno: carbohidratos + proteína + grasa moderada, evitando algo excesivamente pesado justo antes.</p>
+          <p style="font-size:13.5px; color:var(--text-muted);">No es obligatorio comer una sexta comida después. Si hay hambre real, usar una opción proteica ya contemplada en el día — sin sumar calorías extra sin revisar el contexto.</p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="card">
+          <h4 style="font-size:15px;">Cardio</h4>
+          <p style="font-size:13.5px; color:var(--text-muted);">El cardio complementa la alimentación — nunca se usa como castigo por comer.</p>
+          <div style="font-family:Georgia,'Iowan Old Style',serif; font-size:22px; color:var(--accent); margin:8px 0;">2–3 sesiones · 15–25 min</div>
+          <p style="font-size:13px; color:var(--text-muted);">Caminadora inclinada, bicicleta, caminata rápida u otra actividad cardiovascular agradable. Aumentar gradualmente según recuperación.</p>
+        </div>
+        <div class="card">
+          <h4 style="font-size:15px;">Pasos</h4>
+          <table>
+            <tr><td>Fase 1</td><td>3,000–5,000</td></tr>
+            <tr><td>Fase 2</td><td>5,000–7,000</td></tr>
+            <tr><td>Fase 3</td><td>7,000–8,000 (si resulta cómodo)</td></tr>
+          </table>
+          <p style="font-size:12.5px; color:var(--text-muted); margin-top:8px;">Aumentar actividad gradualmente antes de reducir comida de forma importante.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. COMER FUERA -->
+    <section id="fuera">
+      <div class="kicker">Flexibilidad real</div>
+      <h2>Comer fuera de casa</h2>
+      <p class="section-sub">Comer fuera no significa que el día esté arruinado.</p>
+      <div class="card">
+        <table>
+          <tr><th>Prioridad</th><th>Elegir</th></tr>
+          <tr><td>1. Proteína</td><td>Pollo, carne, camarones, atún, huevo</td></tr>
+          <tr><td>2. Carbohidrato</td><td>Arroz, papa, pasta, pan, tortillas</td></tr>
+          <tr><td>3. Vegetales / fruta</td><td>Agregar si están disponibles y son agradables</td></tr>
+          <tr><td>4. Grasas añadidas</td><td>Prestar atención a salsas, mayonesa, exceso de queso, frituras</td></tr>
+        </table>
+        <p style="font-size:13px; color:var(--text-muted); margin-top:10px;">No es necesario pedir todo "light".</p>
+      </div>
+    </section>
+
+    <!-- 12. GUSTO -->
+    <section id="gusto">
+      <div class="kicker">Sin culpa</div>
+      <h2>Comidas de gusto</h2>
+      <div class="card">
+        <div style="font-family:Georgia,'Iowan Old Style',serif; font-size:22px; color:var(--accent); margin-bottom:10px;">1–2 comidas de gusto por semana</div>
+        <p style="font-size:13.5px; color:var(--text-muted);">Pizza, hamburguesa, comida rápida, postre, restaurante, tu comida favorita.</p>
+        <div class="two-col-lists" style="margin-top:14px;">
+          <div>
+            <div class="list-title bad">Una comida de gusto NO es</div>
+            <ul class="plain"><li>Comer ilimitadamente</li><li>Intentar comer lo máximo posible</li><li>Saltarse comidas para "ahorrar" calorías</li><li>Compensar después</li></ul>
+          </div>
+          <div>
+            <div class="list-title good">La regla</div>
+            <p style="font-size:14px;">Disfrutarla y volver normalmente al plan en la siguiente comida. No se convierte en un fin de semana libre.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13. SEGUIMIENTO -->
+    <section id="seguimiento">
+      <div class="kicker">Interpretar los datos</div>
+      <h2>Seguimiento</h2>
+      <p class="section-sub">Ningún número aislado cuenta la historia completa.</p>
+
+      <div class="card">
+        <h4 style="font-size:15px;">Peso</h4>
+        <p style="font-size:13.5px; color:var(--text-muted);">Fluctúa por agua, sodio, carbohidratos, comida en el sistema digestivo, entrenamiento, sueño y estrés. No se evalúa el progreso con una sola medición.</p>
+        <ul class="plain"><li>Pesarse varias veces por semana, en condiciones similares</li><li>Usar el promedio semanal</li><li>Comparar tendencias de 3–4 semanas</li></ul>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h4 style="font-size:15px;">Cintura y composición corporal</h4>
+        <p style="font-size:13.5px; color:var(--text-muted);">El % de grasa corporal (báscula, métodos caseros, estimación visual) es una <b style="color:var(--text);">estimación</b>, no una cifra exacta. 1–2 puntos de diferencia no representan automáticamente ese cambio real.</p>
+        <p style="font-size:13.5px; color:var(--text-muted);">Evaluar en conjunto: tendencia del peso, cintura, fotos en condiciones similares, apariencia, rendimiento en el gym, adherencia y grasa estimada.</p>
+        <div class="note good">Si el peso está estable pero la cintura y la apariencia mejoran, no se reduce automáticamente la comida — probablemente hay recomposición corporal.</div>
+      </div>
+
+      <div class="note warn" style="margin-top:14px;">Si aparecen síntomas importantes o persistentes — pérdida de peso rápida, fatiga marcada, mareos, bajo rendimiento — la recomendación es consultar con un profesional de salud, en lugar de intentar corregirlo solo con calorías.</div>
+    </section>
+
+    <!-- 14. AJUSTES -->
+    <section id="ajustes">
+      <div class="kicker">Cuándo cambiar algo</div>
+      <h2>Sistema de ajustes</h2>
+      <p class="section-sub">La secuencia correcta ante un estancamiento: <b style="color:var(--text);">adherencia → porciones → comidas extra → pasos → entrenamiento → cardio → ajuste calórico pequeño</b>. Nunca se salta directo al último paso.</p>
+
+      <div class="case-card">
+        <div class="case-tag">CASO A</div>
+        <h4>Peso, cintura y grasa estables durante 3–4 semanas</h4>
+        <p style="font-size:13.5px; color:var(--text-muted);">Antes de reducir comida, revisar: calorías reales promedio, comidas fuera, comidas de gusto, bebidas y salsas, tamaño de porciones, pasos, frecuencia de entrenamiento, cardio, sueño y recuperación. Si la adherencia fue buena, primero se aumenta ligeramente la actividad (ej. de 3,000–5,000 a 5,000–7,000 pasos) antes de tocar las calorías. Si luego hace falta ajustar calorías, el cambio es pequeño y conservador.</p>
+      </div>
+      <div class="case-card">
+        <div class="case-tag">CASO B</div>
+        <h4>Peso baja lentamente + cintura disminuye</h4>
+        <p style="font-size:13.5px; color:var(--text-muted);">No se modifica nada. El plan probablemente está funcionando.</p>
+      </div>
+      <div class="case-card">
+        <div class="case-tag">CASO C</div>
+        <h4>Peso estable pero cintura disminuye</h4>
+        <p style="font-size:13.5px; color:var(--text-muted);">Puede haber recomposición corporal. No se reducen calorías automáticamente — se mantiene el plan.</p>
+      </div>
+      <div class="case-card">
+        <div class="case-tag">CASO D</div>
+        <h4>Peso baja rápido + rinde menos + hambre excesiva</h4>
+        <p style="font-size:13.5px; color:var(--text-muted);">No seguir reduciendo calorías. Revisar proteína, carbohidratos, recuperación, sueño, hidratación y cantidad total de comida. Si los síntomas son importantes o persistentes, consultar con un profesional de salud.</p>
+      </div>
+      <div class="case-card">
+        <div class="case-tag">CASO E</div>
+        <h4>Peso sube durante una semana</h4>
+        <p style="font-size:13.5px; color:var(--text-muted);">No se hacen cambios inmediatos. Puede deberse a agua, glucógeno, sodio o contenido intestinal — se espera y se revisa la tendencia de varias semanas.</p>
+      </div>
+    </section>
+
+    <!-- 15. PREFERENCIAS -->
+    <section id="preferencias">
+      <div class="kicker">Gustos y límites</div>
+      <h2>Preferencias alimentarias y embutidos</h2>
+
+      <div class="two-col-lists">
+        <div>
+          <div class="list-title good">Le gustan</div>
+          <ul class="plain">
+            <li><b style="color:var(--text);">Proteína:</b> pollo, carne, huevo, camarones, pavo, atún, salmón, ceviche</li>
+            <li><b style="color:var(--text);">Carbohidratos:</b> arroz blanco, arroz chino, papa bien preparada, pasta, tortillas, pan, avena (moderado)</li>
+            <li><b style="color:var(--text);">Frutas:</b> banana, piña, uvas</li>
+            <li><b style="color:var(--text);">Vegetales tolerados:</b> espárragos con buen sabor, tomate, cebolla, pimentón, zanahoria, brócoli, lechuga, pepino, hongos</li>
+          </ul>
+        </div>
+        <div>
+          <div class="list-title bad">No usar como opción habitual</div>
+          <ul class="plain">
+            <li>Pescado en general (excepciones: salmón, ceviche, camarones, atún)</li>
+            <li>Pulpo</li>
+            <li>Maracuyá</li>
+            <li>Arroz integral (no se recomienda por defecto)</li>
+            <li>Cualquier alimento que se agregue después a esta lista</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="note warn" style="margin-top:16px;">
+        <b>Regla de embutidos:</b> no consumir más de ~2 veces por semana. El jamón de pavo puede aparecer en algunas opciones, pero no se convierte en proteína diaria — se prioriza proteína fresca.
+      </div>
+
+      <div class="note" style="margin-top:12px;">Sin restricciones conocidas: no vegetariano, sin alergias, sin intolerancias ni molestias digestivas conocidas.</div>
+    </section>
+
+    <!-- 16. REGLAS -->
+    <section id="reglas">
+      <div class="kicker">Lo que sostiene el plan</div>
+      <h2>Reglas del sistema</h2>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="list-title bad">No hacer</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>Eliminar carbohidratos o frutas</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>Exigir pesar cada alimento</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>Recomendar déficits extremos</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>Compensar una comida con otra</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>Convertir una comida de gusto en un día libre</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>Reaccionar a una fluctuación de pocos días</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>Llenar comidas de alimentos que no gustan</div>
+        </div>
+        <div class="card">
+          <div class="list-title good">Sí hacer</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Priorizar proteína y alimentos que sí gustan</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Usar porciones visuales, sin balanza</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Permitir comidas de gusto y comer fuera</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Adaptar comidas al horario escolar y al entrenamiento</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Evaluar tendencias, no días sueltos</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Aumentar actividad gradualmente antes de recortar comida</div>
+          <div class="checklist-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Mantener cambios pequeños y explicados</div>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:18px;">
+        <b>Para modificar una comida puntual:</b> "no tengo pollo para el almuerzo" → se propone una sustitución dentro de la misma categoría (carne, camarones, atún, salmón), sin rediseñar todo el plan. Lo mismo aplica a un carbohidrato faltante: pasta, pan, tortillas, papa, yuca o plátano cubren la misma función.
+      </div>
+      <div class="note" style="margin-top:10px;">
+        <b>Para modificar calorías:</b> no se cambia el rango solo por un pesaje puntual ("hoy pesé X"). Se necesita la tendencia de varias semanas de peso, cintura, grasa estimada, pasos y entrenamiento — y el ajuste, cuando corresponde, es pequeño y conservador.
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  Guía práctica de alimentación — pensada para sostenerse durante meses, priorizando adherencia sobre precisión perfecta.
+</footer>
+
+<script>
+// ---------------- WEEK DATA ----------------
+const week = [
+  { day:"Lunes", train:true, meals:[
+    {time:"6:00–6:20 AM", label:"Desayuno", title:"Pan + huevo + queso", items:["2 rebanadas de pan blanco","1 huevo revuelto","2 oz de queso blanco prensado","3/4 taza de piña"], alt:"Opción 5 – Tortillas de maíz + huevo + queso"},
+    {time:"9:45–10:05 AM", label:"Merienda 1", title:"Barrita Tosh + maní", items:["1 barrita de granola Tosh","1/4 taza de maní"], alt:"Opción 3 – SkinnyPop + 16 pistachos"},
+    {time:"11:45 AM–12:20 PM", label:"Almuerzo", title:"Arroz + lentejas + pollo", items:["1/3 taza de arroz blanco","1/2 taza de lentejas","3 oz de pollo a la plancha","1 taza de ensalada mixta","2 cdita de aceite de oliva"], alt:"Opción 10 – Sopa de lentejas"},
+    {time:"3:50–4:00 PM", label:"Merienda 2 · post-entreno", title:"Yogurt + guineo + maní", items:["1 yogurt Bonlac Non Fat","1 guineo pequeño","1 cda de mantequilla de maní"], alt:"Yogurt + fruta + pistachos"},
+    {time:"6:45–7:05 PM", label:"Cena", title:"Tortillas + huevo + queso", items:["2 tortillas de maíz asadas","1 huevo revuelto","2 oz de queso blanco prensado","1/2 taza de vegetales salteados","1 cdita de aceite de oliva"], alt:"Opción 4 – Omelette"}
+  ]},
+  { day:"Martes", train:true, meals:[
+    {time:"6:00–6:20 AM", label:"Desayuno", title:"Crepes de avena", items:["6 cda de harina de avena + 1 huevo + leche + vainilla + canela","1 manzana pequeña picada","1 yogurt griego Oikos Triple Zero"], alt:"Opción 4 – Pancakes"},
+    {time:"9:45–10:05 AM", label:"Merienda 1", title:"SkinnyPop + pistachos", items:["1 paquete de SkinnyPop","16 pistachos"], alt:"Opción 1 – Pan + tomate + parmesano"},
+    {time:"11:45 AM–12:20 PM", label:"Almuerzo", title:"Yuca + pollo/salmón", items:["1 taza de yuca en Air Fryer","3 oz de pollo o salmón a la plancha","1 taza de brócoli en Air Fryer","2 cda de queso parmesano","1 cdita de aceite de oliva"], alt:"Opción 3 – Plátano + pollo"},
+    {time:"3:50–4:00 PM", label:"Merienda 2 · post-entreno", title:"Yogurt + manzana + pistachos", items:["1 yogurt Bonlac Non Fat","1 manzana pequeña","16 pistachos"], alt:"Yogurt + Salmas"},
+    {time:"6:45–7:05 PM", label:"Cena", title:"Omelette", items:["2 rebanadas de pan blanco tostado","omelette de 2 huevos","1 rebanada de queso Munster","1/2 taza de pimentón, cebolla y tomate","1 cdita de aceite de oliva"], alt:"Opción 3 – Tortillas + huevo + queso"}
+  ]},
+  { day:"Miércoles", train:false, meals:[
+    {time:"6:00–6:20 AM", label:"Desayuno", title:"Wrap", items:["2 tortillas Bimbo Rapiditas integral","2 rebanadas de queso Munster","1 rebanada de jamón de pavo","17 uvas pequeñas"], alt:"Contiene embutido (1/2 esta semana) · alt. sin embutido: Opción 6 – Arepa de maíz", flag:"embutido"},
+    {time:"9:45–10:05 AM", label:"Merienda 1", title:"Salmas + pistachos", items:["1 paquete de galletas Salmas","16 pistachos"], alt:"Opción 5 – Pan + mantequilla de maní"},
+    {time:"11:45 AM–12:20 PM", label:"Almuerzo", title:"Papas + carne/pollo", items:["1 taza de papas al horno o en puré","3 oz de carne guisada o pollo","1 taza de vegetales salteados","1 oz de aguacate en guacamole","1 cdita de aceite de oliva"], alt:"Opción 9 – Sopa de carne"},
+    {time:"3:50–4:00 PM", label:"Merienda 2", title:"Yogurt + Salmas + queso crema", items:["1 yogurt Bonlac Non Fat","1 paquete de Salmas o Noel integral","2 cda de queso crema bajo en grasa"], alt:"Yogurt + fruta"},
+    {time:"6:45–7:05 PM", label:"Cena", title:"Quesadilla", items:["2 tortillas integrales","3 rebanadas de queso Munster o mozzarella","1/2 taza de pimentón, tomate y cebolla","1 cdita de aceite de oliva"], alt:"Opción 5 – Wrap con pollo"}
+  ]},
+  { day:"Jueves", train:true, meals:[
+    {time:"6:00–6:20 AM", label:"Desayuno", title:"Pancakes", items:["5 cda de harina de trigo + 1 huevo + canela + stevia","1 huevo en omelette + 1 oz de queso blanco","1 guineo pequeño"], alt:"Opción 1 – Pan + huevo + queso"},
+    {time:"9:45–10:05 AM", label:"Merienda 1", title:"Pan + mantequilla de maní", items:["1 rebanada de pan blanco","1 cda de mantequilla de maní"], alt:"Opción 2 – Barrita Tosh + maní"},
+    {time:"11:45 AM–12:20 PM", label:"Almuerzo", title:"Ensalada de pasta", items:["2/3 taza de pasta","3 oz de atún en agua","1 taza de vegetales","2 cda de mayonesa light"], alt:"Opción 7 – Emparedado de pollo"},
+    {time:"3:50–4:00 PM", label:"Merienda 2 · post-entreno", title:"Yogurt + uvas + pistachos", items:["1 yogurt Bonlac Non Fat","17 uvas pequeñas","16 pistachos"], alt:"Yogurt + banana + mantequilla de maní"},
+    {time:"6:45–7:05 PM", label:"Cena", title:"Salmas + pollo/atún", items:["2 paquetes de galletas Salmas","3 oz de pollo mechado o atún en agua","1 taza de vegetales","1 cdita de aceite de oliva"], alt:"Opción 2 – Wrap o tacos"}
+  ]},
+  { day:"Viernes", train:true, meals:[
+    {time:"6:00–6:20 AM", label:"Desayuno", title:"Tortillas de maíz + huevo + queso", items:["2 tortillas de maíz medianas asadas","1 huevo revuelto","2 oz de queso blanco prensado","1 manzana pequeña"], alt:"Opción 3 – Crepes de avena"},
+    {time:"9:45–10:05 AM", label:"Merienda 1", title:"Pan + tomate + parmesano", items:["1 rebanada de pan blanco","tomate","2 cda de queso parmesano"], alt:"Opción 4 – Salmas + pistachos"},
+    {time:"11:45 AM–12:20 PM", label:"Almuerzo", title:"Emparedado de pollo", items:["2 rebanadas de pan blanco","3 oz de pollo mechado","lechuga, tomate, pepino","2 cda de mayonesa light"], alt:"Opción 1 – Arroz + lentejas"},
+    {time:"3:50–4:00 PM", label:"Merienda 2 · post-entreno", title:"Yogurt + piña + maní", items:["1 yogurt Bonlac Non Fat","3/4 taza de piña","1/4 taza de maní"], alt:"Yogurt + fruta + pistachos"},
+    {time:"6:45–7:05 PM", label:"Cena", title:"Wrap o tacos", items:["2 tortillas integrales","3 oz de pollo mechado o a la plancha","1 taza de vegetales","1 cdita de aceite de oliva"], alt:"Opción 5 – Quesadilla"}
+  ]},
+  { day:"Sábado", train:false, weekend:true, meals:[
+    {time:"~10:00 AM", label:"Desayuno", title:"Arepa de maíz", items:["1 arepa de maíz grande (o 2 Extra Delgadas)","2 huevos revueltos","1 rebanada de queso Munster","1 mandarina grande"], alt:"Opción 1 – Pan + huevo + queso"},
+    {time:"~1:00 PM", label:"Merienda", title:"Barrita Tosh + maní", items:["1 barrita de granola Tosh","1/4 taza de maní"], alt:"Opción 4 – Salmas + pistachos"},
+    {time:"~3:30–4:00 PM", label:"Almuerzo", title:"Sopa de carne", items:["1/2 taza de verdura (papa, yuca, ñame u otoe) o 1 mazorca pequeña","1/3 taza de arroz","3 oz de carne de res","1 taza de vegetales","2 cdita de aceite de oliva"], alt:"Opción 11 – Crema de zapallo o brócoli"},
+    {time:"~7:00–8:00 PM", label:"Merienda", title:"Yogurt + manzana + pistachos", items:["1 yogurt Bonlac Non Fat","1 manzana pequeña","16 pistachos"], alt:"Yogurt + uvas + pistachos"},
+    {time:"~10:00 PM", label:"Cena", title:"Pizza casera", items:["2 panes pita mini integrales","2 rebanadas de queso Munster o mozzarella","1 rebanada de jamón de pavo","1/2 taza de pimentón, tomate y cebolla","1 cda de salsa de tomate sugar free"], alt:"Contiene embutido (2/2 esta semana) · alt. sin embutido: Opción 6 – Lasaña", flag:"embutido"}
+  ]},
+  { day:"Domingo", train:false, weekend:true, meals:[
+    {time:"~10:00 AM", label:"Desayuno", title:"Crepes de avena", items:["6 cda de harina de avena + 1 huevo + leche + vainilla + canela","3/4 taza de piña salteada con canela","1 yogurt griego Oikos Triple Zero"], alt:"Opción 6 – Arepa de maíz"},
+    {time:"~1:00 PM", label:"Merienda", title:"Pan + mantequilla de maní", items:["1 rebanada de pan blanco","1 cda de mantequilla de maní"], alt:"Opción 3 – SkinnyPop + pistachos"},
+    {time:"~3:30–4:00 PM", label:"Almuerzo", title:"Crema de zapallo o brócoli", items:["Crema de zapallo/brócoli licuada con cebolla y caldo de pollo natural","2/3 taza de arroz","3 oz de pollo mechado o al horno","2 cda de queso parmesano","1 cdita de aceite de oliva"], alt:"Opción 1 – Arroz + lentejas"},
+    {time:"~7:00–8:00 PM", label:"Merienda", title:"Yogurt + guineo + maní", items:["1 yogurt Bonlac Non Fat","1 guineo pequeño","1 cda de mantequilla de maní"], alt:"Yogurt + fruta"},
+    {time:"~10:00 PM", label:"Cena", title:"Lasaña", items:["42 g de pasta precocida para lasaña (peso en crudo)","2 oz de carne o pollo","1 rebanada de queso mozzarella","1 taza de vegetales","1 cdita de aceite de oliva"], alt:"Si la porción sale pequeña, disfrutarla como algo libre"}
+  ]}
+];
+
+const tabsEl = document.getElementById('dayTabs');
+const panelsEl = document.getElementById('dayPanels');
+
+week.forEach((d, i) => {
+  const tab = document.createElement('div');
+  tab.className = 'day-tab' + (i===0 ? ' active' : '');
+  tab.dataset.idx = i;
+  tab.innerHTML = d.day + '<span class="tag">' + (d.train ? 'Entrena' : (d.weekend ? 'Finde' : 'Descanso')) + '</span>';
+  tab.addEventListener('click', () => selectDay(i));
+  tabsEl.appendChild(tab);
+
+  const panel = document.createElement('div');
+  panel.className = 'day-panel' + (i===0 ? ' active' : '');
+  panel.dataset.idx = i;
+
+  let rowsHtml = '';
+  d.meals.forEach(m => {
+    rowsHtml += `<div class="meal-row">
+      <div><div class="m-time">${m.time}</div><div class="m-label">${m.label}</div></div>
+      <div class="m-main"><b>${m.title}${m.flag==='embutido' ? ' <span class=\"badge embutido\">embutido</span>' : ''}</b><ul>${m.items.map(it=>'<li>'+it+'</li>').join('')}</ul></div>
+      <div class="m-alt"><b>Alternativa:</b> ${m.alt}</div>
+    </div>`;
+  });
+
+  panel.innerHTML = `
+    <div class="card">
+      <div class="day-head">
+        <h3>${d.day}</h3>
+        <div class="day-flags">${d.train ? '<span class="flag train">Día de entreno</span>' : '<span class="flag rest">Descanso</span>'}${d.weekend ? '<span class="flag rest">Fin de semana</span>' : ''}</div>
+      </div>
+      ${rowsHtml}
+    </div>`;
+  panelsEl.appendChild(panel);
+});
+
+function selectDay(i){
+  document.querySelectorAll('.day-tab').forEach(t => t.classList.toggle('active', +t.dataset.idx === i));
+  document.querySelectorAll('.day-panel').forEach(p => p.classList.toggle('active', +p.dataset.idx === i));
+}
+
+// ---------------- SIDEBAR NAV ----------------
+const links = document.querySelectorAll('.nav-link');
+links.forEach(link => {
+  link.addEventListener('click', () => {
+    document.getElementById(link.dataset.target).scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
+
+const sections = document.querySelectorAll('main section');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      links.forEach(l => l.classList.toggle('active', l.dataset.target === entry.target.id));
+    }
+  });
+}, {rootMargin:'-15% 0px -75% 0px'});
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
